@@ -55,11 +55,20 @@
 </head>
 <body>
     
-  <form class="upload-container" id="uploadForm">
-    <h1><i class="fa-solid fa-share-nodes"></i> Daniel Sherratt</h1>
-    <input type="file" id="fileInput" name="file" required />
-    <button type="submit">Share</button>
-  </form>
+  
+
+
+   <div class="upload-container">
+    <h1>Upload to R2</h1>
+    <form id="uploadForm">
+      <label class="file-label">
+        <input type="file" id="fileInput" name="file" required />
+        <span>Select a file…</span>
+      </label>
+      <button type="submit" class="btn">Upload</button>
+    </form>
+    <div id="status" class="status"></div>
+  </div>
 
     <script>
     const form = document.getElementById('uploadForm');
