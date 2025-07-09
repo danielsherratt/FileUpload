@@ -94,53 +94,80 @@
     <div id="status" class="status"></div>
   </div>
 
-  <script>
-    const form = document.getElementById('uploadForm');
-    const status = document.getElementById('status');
-    const progress = document.getElementById('uploadProgress');
+<script>
+  const form     = document.getElementById('uploadForm');
+  const status   = document.getElementById('status');
+  const progress = document.getElementById('uploadProgress');
 
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const file = document.getElementById('fileInput').files[0];
-      if (!file) return;
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const file = document.getElementById('fileInput').files[0];
+    if (!file) return;
 
-      // prepare UI
-      status.textContent = '';
-      progress.value = 0;
-      progress.style.display = 'block';
+    // reset UI
+    status.textContent = '';
+    progress.value = 0;
+    progress.style.display = 'block';
 
-      // build payload
-      const formData = new FormData();
-      formData.append('file', file);
+    const formData = new FormData();
+    formData.append('file', file);
 
-      // use XHR to get upload progress events
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', '/api/upload', true);
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/upload', true);
 
-      xhr.upload.onprogress = evt => {
-        if (evt.lengthComputable) {
-          const percent = Math.round((evt.loaded / evt.total) * 100);
-          progress.value = percent;
-          status.textContent = `Uploading… ${percent}%`;
+    xhr.upload.onprogress = evt => {
+      if (evt.lengthComputable) {
+        const pct = Math.round(evt.loaded/evt.total * 100);
+        progress.value = pct;
+        status.textContent = `Uploading… ${pct}%`;
+      }
+    };
+
+    xhr.onload = () => {
+      progress.style.display = 'none';
+      if (xhr.status >= 200 && xhr.status < 300) {
+        let resp;
+        try {
+          resp = JSON.parse(xhr.responseText);
+        } catch {
+          status.textContent = '✅ Upload complete!';
+          return;
         }
-      };
+        // Show a view link
+        const link = document.createElement('a');
+        link.href = resp.url;
+        link.target = '_blank';
+        link.textContent = 'View file';
+        link.style.display = 'inline-block';
+        link.style.marginTop = '0.5rem';
 
-      xhr.onload = () => {
-        progress.style.display = 'none';
-        if (xhr.status >= 200 && xhr.status < 300) {
-          status.textContent = '✅ Success! <a href="${url}" target="_blank">View file</a>';
+        // Optionally preview images inline:
+        if (file.type.startsWith('image/')) {
+          const img = document.createElement('img');
+          img.src = resp.url;
+          img.alt = file.name;
+          img.style.maxWidth = '100%';
+          img.style.marginTop = '0.5rem';
+          status.innerHTML = '✅ Upload complete!';
+          status.appendChild(link);
+          status.appendChild(img);
         } else {
-          status.textContent = `❌ Upload failed: ${xhr.statusText || xhr.responseText}`;
+          status.innerHTML = '✅ Upload complete!';
+          status.appendChild(link);
         }
-      };
+      } else {
+        status.textContent = `❌ Upload failed: ${xhr.statusText || xhr.responseText}`;
+      }
+    };
 
-      xhr.onerror = () => {
-        progress.style.display = 'none';
-        status.textContent = '❌ Error during upload.';
-      };
+    xhr.onerror = () => {
+      progress.style.display = 'none';
+      status.textContent = '❌ Error during upload.';
+    };
 
-      xhr.send(formData);
-    });
-  </script>
+    xhr.send(formData);
+  });
+</script>
+
 </body>
 </html>
