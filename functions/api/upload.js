@@ -16,7 +16,7 @@ export async function onRequestPost({ request, env }) {
   });
 
   // If your bucket is public, this URL will be accessible directly:
-  const url = `https://${env.ACCOUNT_ID}.r2.cloudflarestorage.com/${key}`;
+  const url = `https://https://pub-${env.ACCOUNT_ID}.r2.dev/${key}`;
   return new Response(JSON.stringify({ url }), {
     headers: { 'Content-Type': 'application/json' }
   });
