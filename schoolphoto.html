@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <title>Share with Daniel Sherratt</title>
+  <title>New Era School Photo</title>
   <style>
     /* Center the form on the page */
     body {
@@ -85,10 +85,10 @@
 </head>
 <body>
   <div class="upload-container">
-    <h1><i class="fa-solid fa-share-nodes"></i> Daniel Sherratt</h1>
+    <h1><i class="fa-regular fa-image"></i> New Era Photo Upload</h1>
     <form id="uploadForm">
       <input type="file" id="fileInput" name="file" required />
-      <button type="submit">Share</button>
+      <button type="submit">Upload</button>
     </form>
     <progress id="uploadProgress" value="0" max="100" style="display: none;"></progress>
     <div id="status" class="status"></div>
@@ -104,11 +104,12 @@
     const file = document.getElementById('fileInput').files[0];
     if (!file) return;
 
-    // reset UI
+    // Reset UI
     status.textContent = '';
     progress.value = 0;
     progress.style.display = 'block';
 
+    // Build form payload
     const formData = new FormData();
     formData.append('file', file);
 
@@ -117,7 +118,7 @@
 
     xhr.upload.onprogress = evt => {
       if (evt.lengthComputable) {
-        const pct = Math.round(evt.loaded/evt.total * 100);
+        const pct = Math.round(evt.loaded / evt.total * 100);
         progress.value = pct;
         status.textContent = `Uploading… ${pct}%`;
       }
@@ -133,28 +134,17 @@
           status.textContent = '✅ Upload complete!';
           return;
         }
-        // Show a view link
+
+        // Show a view link only
+        status.textContent = '✅ Upload complete!';
         const link = document.createElement('a');
         link.href = resp.url;
         link.target = '_blank';
-        link.textContent = 'View file';
+        link.textContent = ' View file';
         link.style.display = 'inline-block';
         link.style.marginTop = '0.5rem';
+        status.appendChild(link);
 
-        // Optionally preview images inline:
-        if (file.type.startsWith('image/')) {
-          const img = document.createElement('img');
-          img.src = resp.url;
-          img.alt = file.name;
-          img.style.maxWidth = '100%';
-          img.style.marginTop = '0.5rem';
-          status.innerHTML = '✅ Upload complete!';
-          status.appendChild(link);
-          status.appendChild(img);
-        } else {
-          status.innerHTML = '✅ Upload complete!';
-          status.appendChild(link);
-        }
       } else {
         status.textContent = `❌ Upload failed: ${xhr.statusText || xhr.responseText}`;
       }
@@ -168,6 +158,7 @@
     xhr.send(formData);
   });
 </script>
+
 
 </body>
 </html>
